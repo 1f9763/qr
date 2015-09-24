@@ -2,13 +2,13 @@
 from django.http import HttpResponse
 import qrcode
 from cStringIO import StringIO
-import  urllib
+
 
 def generate_qrcode(request, data):
-    img = qrcode.make(urllib.unquote(data))
+    img = qrcode.make(data)
 
-    buf = StringIO()
-    img.save(buf)
+    # buf = StringIO()
+    img.save(img)
     image_stream = buf.getvalue()
 
     response = HttpResponse(image_stream, content_type="image/png")

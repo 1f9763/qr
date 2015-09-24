@@ -2,10 +2,10 @@
 from django.http import HttpResponse
 import qrcode
 from cStringIO import StringIO
-import  urllib
+
 
 def generate_qrcode(request, data):
-    img = qrcode.make(urllib.unquote(data))
+    img = qrcode.make(data.decode('GBK'))
 
     buf = StringIO()
     img.save(buf)

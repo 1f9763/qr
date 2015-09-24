@@ -5,7 +5,7 @@ from cStringIO import StringIO
 import  urllib
 
 def generate_qrcode(request, data):
-    img = qrcode.make(urllib.unquote(data))
+    img = qrcode.make(urllib.unquote(data).decode('gb2312'))
 
     buf = StringIO()
     img.save(buf)
