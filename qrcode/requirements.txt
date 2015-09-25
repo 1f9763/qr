@@ -1,3 +1,5 @@
 django
 qrcode
 Image
+lxml
+wechat_sdk
