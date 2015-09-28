@@ -10,25 +10,25 @@
 # from django.utils.encoding import smart_str
 # from django.views.decorators.csrf import csrf_exempt
 #
-#
-#
-# def generate_qrcode(request, data):
-#     img = qrcode.make(urllib.unquote(data))
-#
-#     buf = StringIO()
-#     img.save(buf)
-#     image_stream = buf.getvalue()
-#
-#     response = HttpResponse(image_stream, content_type="image/png")
-#     response['Last-Modified'] = 'Mon, 27 Apr 2015 02:05:03 GMT'
-#     response['Cache-Control'] = 'max-age=31536000'
-#     return response
+# #
+# #
+# # def generate_qrcode(request, data):
+# #     img = qrcode.make(urllib.unquote(data))
+# #
+# #     buf = StringIO()
+# #     img.save(buf)
+# #     image_stream = buf.getvalue()
+# #
+# #     response = HttpResponse(image_stream, content_type="image/png")
+# #     response['Last-Modified'] = 'Mon, 27 Apr 2015 02:05:03 GMT'
+# #     response['Cache-Control'] = 'max-age=31536000'
+# #     return response
 #
 #
 # WEIXIN_TOKEN = 'pang'
 #
 # @csrf_exempt
-# def weixin_main(request):
+# def index(request):
 #     """
 #     所有的消息都会先进入这个函数进行处理，函数包含两个功能，
 #     微信接入验证是GET方法，
@@ -65,6 +65,7 @@ from django.views.decorators.csrf import csrf_exempt
 from wechat_sdk import WechatBasic
 from wechat_sdk.exceptions import ParseError
 from wechat_sdk.messages import TextMessage
+import  urllib,re#,Skype4Py
 
 
 WECHAT_TOKEN = 'pang'
@@ -78,6 +79,23 @@ wechat_instance = WechatBasic(
     appsecret=AppSecret
 )
 
+def helloqt():
+
+    #url='http://news.iciba.com/dailysentence/detail-1479.html'
+    url='http://www.azquotes.com/'
+    returnHtml=urllib.urlopen(url).read()
+    # print blogHtml
+    pattern=re.compile('<a class="title.*?">(.*?)</a>.*?<a href=.*?">(.*?)</a>',re.S)
+    result=re.findall(pattern,returnHtml)
+    result=result[0][0]+'--by '+result[0][1]+'\n <a href="http://helloqt.duapp.com/">post by dakara\'s qt robot</a>'
+
+    return result
+    # skype=Skype4Py.Skype()
+    # skype.Attach()
+    # print 'name',skype.CurrentUser.MoodText
+    # skype.CurrentUserProfile._SetMoodText(result)
+
+
 @csrf_exempt
 def index(request):
     if request.method == 'GET':
@@ -87,12 +105,9 @@ def index(request):
         timestamp = request.GET.get('timestamp')
         nonce = request.GET.get('nonce')
 
-        if not wechat_instance.check_signature(
-                signature=signature, timestamp=timestamp, nonce=nonce):
-            return HttpResponseBadRequest('nihao meizi')
-
-        return HttpResponse(
-            request.GET.get('echostr', ''), content_type="text/plain")
+        if not wechat_instance.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
+            return HttpResponseBadRequest('本立而道生')
+        return HttpResponse(request.GET.get('echostr', ''), content_type="text/plain")
 
 
     # 解析本次请求的 XML 数据
@@ -108,21 +123,19 @@ def index(request):
     response = wechat_instance.response_text(
         content = (
             '感谢您的关注！\n回复【功能】两个字查看支持的功能，还可以回复任意内容开始聊天'
-            '\n【<a href="http://www.ziqiangxuetang.com">自强学堂手机版</a>】'
+            '\n【<a href="http://www.xxx.com">dakara qt 微信版</a>】'
             ))
     if isinstance(message, TextMessage):
         # 当前会话内容
         content = message.content.strip()
         if content == '功能':
             reply_text = (
-                    '目前支持的功能：\n1. 关键词后面加上【教程】两个字可以搜索教程，'
-                    '比如回复 "Django 后台教程"\n'
-                    '2. 回复任意词语，查天气，陪聊天，讲故事，无所不能！\n'
+                    '目前支持的功能：\n1. 【qt】两个字可以得到一句哲理，\n'
                     '还有更多功能正在开发中哦 ^_^\n'
-                    '【<a href="http://www.ziqiangxuetang.com">自强学堂手机版</a>】'
-                )
-        elif content.endswith('教程'):
-            reply_text = '您要找的教程如下：'
+                    '【<a href="http://helloqt.duapp.com/">dakara qt 微信版</a>】'
+            )
+        elif content.endswith('qt'):
+            reply_text = helloqt()
 
         response = wechat_instance.response_text(content=reply_text)
 

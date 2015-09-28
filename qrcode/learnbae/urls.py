@@ -22,6 +22,6 @@ urlpatterns = [
     url(r'^qrcode/(.+)$', 'baetest.views.generate_qrcode', name='qrcode'),
     url(r'^$', 'baetest.views.index', name='home'),# Notice this line
     url(r'^.+$', 'baetest.views.index', name='home1'),# Notice this line
-    url(r'^wechat/$', 'baetest.views.weixin_main', name='wechat'),
+    url(r'^wechat/$', 'baetest.views.index', name='wechat'),
 
 ]
